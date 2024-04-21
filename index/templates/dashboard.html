@@ -1,0 +1,389 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load widget_tweaks %}
+{% load humanize %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'index/css/b4.css' %}">
+<script src="{% static 'index/js/b4.js' %}"></script>
+<script src="{% static 'index/js/zingchart.js' %}"></script>
+
+<div class="row">
+    <div class="col-md-12">
+        <h3 class="text-center">Dashboard <i class="nav-icon fas fa-chart-line"></i></h3>
+        <div class="card card-body" style="overflow:scroll">
+            <div class="row">
+                <input type="hidden" name="action" value="equipo">
+                <input type="hidden" name="id_equipo" id="id_equipo">
+                <div class="col-md-5">
+                    <input type="date" class="form-control border border-primary" required id="fechainicio"
+                        name="fechainicio">
+                </div>
+                <div class="col-md-5">
+                    <input type="date" class="form-control border border-primary" placeholder="Ingrese una máquina"
+                        id="fechafin" name="fechafin" required>
+                </div>
+                <div class="col-md-1">
+                    <button class="btn btn-dark btn-lg mb-4" type="button" onclick="consultData()"><i
+                            class="text-white nav-icon fas fa-chart-line"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 text-center">
+        <div class="card text-white bg-dark text-center" style="max-width: 155px;">
+            <p class="card-title">
+                Total Ventas: <i class="fas fa-dollar-sign text-success"></i>
+            </p>
+            <p class="card-title" id="totalventas">
+                $ {{total_ventas|floatformat:2|intcomma}}
+            </p>
+        </div>
+    </div>
+    <div class="col-md-3 text-center">
+        <div class="card text-white bg-dark text-center" style="max-width: 155px;">
+            <p class="card-title">
+                Total Compras: <i class="fas fa-dollar-sign text-success"></i>
+            </p>
+            <p class="card-title" id="totalcompras">
+                $ {{total_compras|floatformat:2|intcomma}}
+            </p>
+        </div>
+    </div>
+    <div class="col-md-3 text-center">
+        <div class="card text-white bg-dark text-center" style="max-width: 155px;">
+            <p class="card-title">
+                Núm. Ventas: <i class="fas fa-clock text-success"></i>
+            </p>
+            <p class="card-title" id="totalpedidos">
+                {{total_pedidos|floatformat:2|intcomma}}
+            </p>
+        </div>
+    </div>
+    <div class="col-md-3 text-center">
+        <div class="card text-white bg-dark text-center" style="max-width: 155px;">
+            <p class="card-title">
+                Devoluciones: <i class="fas fa-clock text-success"></i>
+            </p>
+            <p class="card-title" id="totaldevoluciones">
+                {{total_devoluciones|floatformat:2|intcomma}}
+            </p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div id="ChartHV"></div>
+    </div>
+    <div class="col-md-6">
+        <div id="ChartP"></div>
+    </div>
+    <div class="col-md-6">
+        <div id="ChartT"></div>
+    </div>
+    <div class="col-md-6">
+        <div id="ChartA"></div>
+    </div>
+</div>
+<script>
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+        fechasVentas = [];
+        subtotalesVentas = [];
+        cantRegistrada = [];
+        cantReal = [];
+        keysProductos = [];
+
+        "{% for i in fechas_ventas %}"
+        fechasVentas.push("{{i}}")
+        "{% endfor %}"
+
+        "{% for i in subtotales_ventas %}"
+        subtotalesVentas.push(parseFloat("{{i}}", 2))
+        "{% endfor %}"
+
+        "{% for i in ajustes %}"
+        cantRegistrada.push(parseFloat("{{i.cantidad_registrada}}", 2));
+        cantReal.push(parseFloat("{{i.cantidad_real}}", 2));
+        keysProductos.push("{{i.producto.descripcion}}");
+
+        "{% endfor %}"
+
+        buildChartHV(fechasVentas, subtotalesVentas);
+        buildChartP(parseFloat('{{entregados}}',2), parseFloat('{{no_entregados}}',2));
+        buildChartT(parseFloat('{{entregados}}',2), parseFloat('{{devoluciones}}',2));
+        buildChartA(cantRegistrada, cantReal, keysProductos);
+    });
+</script>
+<script>
+
+
+    function consultData() {
+
+        if (document.getElementById("fechainicio").value == '' || document.getElementById("fechafin").value == '') {
+            Swal.fire({
+                icon: 'error',
+                title: '',
+                text: "Datos incompletos",
+                footer: "Favor de elegir fecha inicio y fecha fin."
+            })
+            return
+        }
+        $.ajax({
+            url: "{% url 'Result' %}",
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                'fechainicio': document.getElementById("fechainicio").value,
+                'fechafin': document.getElementById("fechafin").value
+            },
+            dataType: 'json',
+        }).done(function (data) {
+            //alert("Consulta terminada")
+            buildChartHV(data["fechas_ventas"], data["subtotales_ventas"]);
+            buildChartP(parseFloat(data["entregado"]), parseFloat(data["no_entregado"]));
+            buildChartT(parseFloat(data["entregado"]), parseFloat(data["devolucion"]));
+            buildChartA(data["cantidad_registrada"], data["cantidad_real"],data["keys_productos"]);
+            document.getElementById("totalventas").innerText = "$" + parseFloat(data["total_ventas"]).toFixed(2);
+            document.getElementById("totalcompras").innerText = "$" + parseFloat(data["total_compras"]).toFixed(2);
+            document.getElementById("totalpedidos").innerText = parseFloat(data["total_pedidos"]).toFixed(2);
+            document.getElementById("totaldevoluciones").innerText = parseFloat(data["total_devoluciones"]).toFixed(2);
+        }).fail(
+            function (jqXHR, textStatus, errorThrown) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: textStatus,
+                    footer: errorThrown
+                })
+            }).always(
+                function (data) {
+                });
+    }
+
+
+    function buildChartHV(keys, values) {
+        let ChartDataVentas = {
+            'type': 'line',
+            'theme': 'classic',
+            'title': {
+                text: 'Ultimas 10 ventas',
+                fontSize: 15,
+            },
+            'legend': {
+                draggable: true,
+            },
+            'series': [{
+                values: values,
+                text: '$ Total',
+                'line-color': 'black',
+                marker: {
+                    'background-color': "yellow"
+                }
+            },
+            ],
+            'scaleX': {
+                // Set scale label
+                label: { text: 'Fecha', fontSize: 10 },
+                labels: keys,
+            },
+            scaleY: {
+                // Scale label with unicode character
+                label: { text: '$ Subtotales', fontSize: 10 },
+                format: '$%v',
+            },
+            plotarea: {
+                'margin': "13%",
+            },
+            plot: {
+                tooltip: {
+                    text: "Fecha: %kl<br>$%v",
+                    'background-color': 'black',
+                }
+            },
+            /*
+            plot: {    
+                animation: {
+                    effect: '1', 
+                    delay: '5000',
+                    speed: 400
+                }
+            }
+            */
+        }
+        zingchart.render(
+            {
+                id: 'ChartHV',
+                data: ChartDataVentas,
+            }
+        )
+    }
+
+
+    function buildChartP(entregado, no_entregado) {
+        let ChartDataP = {
+            'type': 'pie',
+            'theme': 'classic',
+            'title': {
+                text: 'Productos entregados',
+                fontSize: 15,
+            },
+            'legend': {
+                draggable: true,
+            },
+            'series': [
+                {
+                    values: [entregado],
+                    text: "Entregados: " + entregado,
+                    backgroundColor: '#50ADF5',
+                },
+                {
+                    values: [no_entregado],
+                    text: "No entregados: " + no_entregado,
+                    backgroundColor: '#FF7965',
+                    detached: true
+                },
+            ],
+            plotarea: {
+                'margin': "13%",
+            },
+            plot: {
+                tooltip: {
+                    text: "",
+                    'background-color': 'black',
+                }
+            },
+            /*
+            plot: {    
+                animation: {
+                    effect: '1', 
+                    delay: '5000',
+                    speed: 400
+                }
+            }
+            */
+        }
+        zingchart.render(
+            {
+                id: 'ChartP',
+                data: ChartDataP,
+            }
+        )
+
+    }
+
+    function buildChartT(entregado, devuelto) {
+        let ChartDataT = {
+            'type': 'pie',
+            'theme': 'classic',
+            'title': {
+                text: 'Productos Devoluciones',
+                fontSize: 15,
+            },
+            'legend': {
+                draggable: true,
+            },
+            'series': [
+                {
+                    values: [entregado],
+                    text: "Entregados: " + entregado,
+                    backgroundColor: '#50ADF5',
+                },
+                {
+                    values: [devuelto],
+                    text: "Devuelto: " + devuelto,
+                    backgroundColor: '#FF7965',
+                    detached: true
+                },
+            ],
+            plotarea: {
+                'margin': "13%",
+            },
+            plot: {
+                tooltip: {
+                    text: "",
+                    'background-color': 'black',
+                }
+            },
+            /*
+            plot: {    
+                animation: {
+                    effect: '1', 
+                    delay: '5000',
+                    speed: 400
+                }
+            }
+            */
+        }
+        zingchart.render(
+            {
+                id: 'ChartT',
+                data: ChartDataT,
+            }
+        )
+    }
+
+    function buildChartA(registrada, real, keys) {
+        let ChartDataA = {
+            'type': 'line',
+            'theme': 'classic',
+            'title': {
+                text: 'Ajustes de inventario',
+                fontSize: 15,
+            },
+            'legend': {
+                draggable: true,
+            },
+            'series': [
+            {
+                    values: registrada,
+                    text: "Cant. registrada: ",
+                    backgroundColor: '#50ADF5',
+                },
+                {
+                    values: real,
+                    text: "Cantidad real: ",
+                    backgroundColor: '#FF7965',
+                    detached: true
+                },
+            ],
+            'scaleX': {
+                // Set scale label
+                label: { text: 'Producto', fontSize: 10 },
+                labels: keys,
+            },
+            scaleY: {
+                // Scale label with unicode character
+                label: { text: 'Cantidad', fontSize: 10 },
+                format: '%v ',
+            },
+            plotarea: {
+                'margin': "13%",
+            },
+            plot: {
+                tooltip: {
+                    text: "",
+                    'background-color': 'black',
+                }
+            },
+            /*
+            plot: {    
+                animation: {
+                    effect: '1', 
+                    delay: '5000',
+                    speed: 400
+                }
+            }
+            */
+        }
+        zingchart.render(
+            {
+                id: 'ChartA',
+                data: ChartDataA,
+            }
+        )
+    }
+
+</script>
+
+{% endblock %}

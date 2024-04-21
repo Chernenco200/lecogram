@@ -1,0 +1,91 @@
+{% load static %}
+{% load humanize %}
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Venta</title>
+    <style>
+        @page {
+            size: "A4";
+            margin: 1.0cm 1.5cm 3.5cm 1.5cm;
+        }
+
+        body {
+            width: 100% !important;
+            height: 100%;
+            background: #fff;
+            color: black;
+            font-size:medium;
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+            -webkit-text-size-adjust: none;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="container">
+        <table class="table">
+            <tr>
+                <td class="text-left">
+                    <img class="text-left" src="{{empresa.imagen.url}}" alt="Logo empresa" width="30" height="4">
+                </td>
+                <td class="text-right">
+                    # Venta: {{num_ticket}} <br>
+                    Fecha: {{fecha}} <br>
+                    {{empresa.nombre}}</br>
+                    {{empresa.domicilio}} <br>
+                    {{empresa.telefono}}<br>
+                    Cliente: {{cliente}} <br>
+                    <br>
+                </td>
+            </tr>
+        </table>
+        <table class="table">
+            <tr>
+                <td> <b>Cant.</b></td>
+                <td> <b> Producto</b> </td>
+                <td> <b>Subtotal</b> </td>
+            </tr>
+            <tbody class="text-dark">
+                {% if iva == "false" or iva == "False" %}
+                {% for i in items %}
+                <tr>
+                    <td>{{i.cantidad}}</td>
+                    <td>{{i.producto.descripcion}}</td>
+                    <td>{{empresa.moneda}} {{i.total|intcomma}}</td>
+
+                </tr>
+                {% endfor %}
+                {% elif iva == "true" or iva == "True" %}
+                {% for i in items %}
+                <tr>
+                    <td>{{i.cantidad}}</td>
+                    <td>{{i.producto.descripcion}}</td>
+                    <td>{{empresa.moneda}} {{i.subtotal|intcomma}}</td>
+
+                </tr>
+                {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+        <div class="row">
+            <div class="col-12">
+                {% if iva == "true" or iva == "True" %}
+                <p style="text-align: right;"> <b> Subtotal: {{empresa.moneda}} {{subtotal|floatformat:"2"|intcomma}}</b></p>
+                <p style="text-align: right;"> <b> Iva: {{empresa.moneda}} {{iva_suma|floatformat:"2"|intcomma}}</b></p>
+                {% endif %}
+                <p style="text-align: right;"> <b> Total: {{empresa.moneda}} {{total|floatformat:"2"|intcomma}}</b></p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <p style="text-align: center;">GRACIAS POR SU PREFERENCIA</P>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>
