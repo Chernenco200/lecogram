@@ -74,12 +74,19 @@ class ClienteForm(forms.ModelForm):
     class Meta:
         imagen = forms.ImageField()
         model = Cliente
-        fields = ('codigo','nombre', 'telefono', 'imagen')
+        fields = ('codigo','nombre', 'Edad','telefono', 'OD_Esf','OI_Esf','OD_Cil','OI_Cil','ADD','DIP', 'imagen')
         labels = {
-            'codigo': 'Código: ',
+            'codigo': 'DNI: ',
+            'nombre': 'Nombre: ',
+            'Edad': 'Edad',
             'telefono': 'Telefono: ',
+            'OD_Esf': 'OD_Esf',
+            'OI_Esf': 'OI_Esf',
+            'OD_Cil': 'OD_Cil',
+            'OI_Cil': 'OI_Cil',
+            'ADD': 'ADD',
+            'DIP': 'DIP',
             'imagen': 'Imagen: ',
-            'nombre': 'Descripcion: '
         }
 
 class EditarClienteForm(forms.ModelForm):
@@ -87,18 +94,35 @@ class EditarClienteForm(forms.ModelForm):
     class Meta:
         imagen = forms.ImageField()
         model = Cliente
-        fields = ('codigo','nombre', 'telefono', 'imagen')
+        fields = ('codigo','nombre','Edad','telefono','OD_Esf','OI_Esf','OD_Cil','OI_Cil','ADD','DIP', 'imagen')
         labels = {
-            'codigo': 'Código: ',
+            'codigo': 'DNI: ',
+            'nombre': 'Nombre: ',
+            'Edad': 'Edad: ',
             'telefono': 'Telefono: ',
+            'OD_Esf': 'OD_Esf: ',
+            'OI_Esf': 'OI_Esf: ',
+            'OD_Cil': 'OD_Cil: ',
+            'OI_Cil': 'OI_Cil: ',
+            'ADD': 'ADD: ',
+            'DIP': 'DIP: ',
             'imagen': 'Imagen: ',
-            'nombre': 'Descripcion: '
+            
         }
 
         widgets = {
             'codigo': forms.TextInput(attrs={'type': 'text', 'id': 'codigo_editar'}),
             'nombre': forms.TextInput(attrs={'id': 'nombre_editar'}),
+            'Edad': forms.TextInput(attrs={'id': 'Edad_editar'}),
             'telefono': forms.TextInput(attrs={'id': 'telefono_editar'}),
+            'OD_Esf': forms.TextInput(attrs={'id': 'OD_Esf_editar'}),
+            'OI_Esf': forms.TextInput(attrs={'id': 'OI_Esf_editar'}),
+            'OD_Cil': forms.TextInput(attrs={'id': 'OD_Cil_editar'}),
+            'OI_Cil': forms.TextInput(attrs={'id': 'OI_Cil_editar'}),            
+            'ADD': forms.TextInput(attrs={'id': 'ADD_editar'}),
+            'DIP': forms.TextInput(attrs={'id': 'DIP_editar'}),
+
+
         }
 
 class InventarioForm(forms.ModelForm):
@@ -235,7 +259,7 @@ class EditarPersonalForm(forms.ModelForm):
             'cargo': 'Cargo: ', 
             'imagen': 'Imagen: ',
             'zona': 'Zona: ',
-            'codigo': 'Código: ',
+            'codigo': 'DNI: ',
         }
 
         widgets = {

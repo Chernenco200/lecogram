@@ -101,7 +101,15 @@ class Proveedor (models.Model):
 
 class Cliente (models.Model):
     codigo = models.CharField(max_length=255, null=True, blank = True)
+    Codigo_Padre = models.CharField(max_length=255, null=True, blank = True)
     nombre = models.CharField(max_length=255)
+    OD_Esf = models.CharField(max_length=15, null=True, blank = True, default ="0.00")
+    OI_Esf = models.CharField(max_length=15, null=True, blank = True, default ="0.00")
+    OD_Cil = models.CharField(max_length=15, null=True, blank = True, default="-0.00 X 0°")
+    OI_Cil = models.CharField(max_length=15, null=True, blank = True, default="-0.00 X 0°")
+    ADD = models.CharField(max_length=15, null=True, blank = True, default="+0.00")
+    DIP = models.CharField(max_length=15, null=True, blank = True)
+    Edad = models.CharField(max_length=3, null=True, blank = True, default =0)
     telefono = models.CharField(max_length=255, null=True, blank=True)
     imagen = models.ImageField(upload_to='cliente', null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -211,6 +219,8 @@ class Egreso(models.Model):
     ticket = models.BooleanField(default=True)
     desglosar = models.BooleanField(default=True)
     updated = models.DateTimeField(auto_now_add=True , null=True)
+    
+    personal = models.ForeignKey(Personal, on_delete=models.SET_NULL , null=True , related_name='personall')
 
     class Meta:
         verbose_name='egreso'

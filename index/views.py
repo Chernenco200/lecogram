@@ -29,6 +29,8 @@ from weasyprint import HTML, CSS
 from django.conf import settings
 from django.db.models import Sum
 
+#from bs4 import BeautifulSoup
+#import requests
 
 # Create your views here.
 
@@ -679,6 +681,28 @@ def export_pdf_view(request, id, iva):
 
     venta = Egreso.objects.get(pk=float(id))
     datos = ProductosEgreso.objects.filter(egreso=venta)
+    vendedor = Personal.objects.all()
+        
+    hora_actual = venta.updated.time()
+    fecha_ficticia = venta.fecha_pedido
+    # Combina la fecha ficticia con la hora actual
+    fecha_hora_actual = datetime.combine(fecha_ficticia, hora_actual)
+
+    Hora_entrega = fecha_hora_actual + timedelta(hours=1)
+    total = venta.total
+    A_cuenta = venta.pagado
+    Saldo = total - A_cuenta
+   
+    
+
+    
+
+
+
+
+    
+    
+
     for i in datos:
         subtotal = subtotal + float(i.subtotal)
         iva_suma = iva_suma + float(i.iva)
@@ -689,12 +713,21 @@ def export_pdf_view(request, id, iva):
         'iva': iva,
         'fecha': venta.fecha_pedido,
         'cliente': venta.cliente.nombre,
+        'telefono': venta.cliente.telefono,
         'items': datos, 
-        'total': venta.total, 
+        'total': total, 
         'empresa': empresa,
         'comentarios': venta.comentarios,
         'subtotal': subtotal,
         'iva_suma': iva_suma,
+        
+        'hora': venta.updated.time(),
+        'Hora_entrega' : Hora_entrega,
+        'A_cuenta' : A_cuenta,
+        'Saldo' : Saldo,
+        'vendedor' : vendedor,
+
+
     }
     html_template = template.render(context)
     response = HttpResponse(content_type="application/pdf")
@@ -717,6 +750,10 @@ def export_pdf_carta_view(request, id, iva):
 
     venta = Egreso.objects.get(pk=float(id))
     datos = ProductosEgreso.objects.filter(egreso=venta)
+ 
+
+
+    
     for i in datos:
         subtotal = subtotal + float(i.subtotal)
         iva_suma = iva_suma + float(i.iva)
@@ -733,6 +770,8 @@ def export_pdf_carta_view(request, id, iva):
         'comentarios': venta.comentarios,
         'subtotal': subtotal,
         'iva_suma': iva_suma,
+    
+
     }
     
     html_template = template.render(context)
@@ -969,3 +1008,5 @@ def add_abono_view(request):
 
 
     return redirect('Creditos')
+
+

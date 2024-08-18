@@ -172,6 +172,26 @@
         </div>
     </div>
 </div>
+
+<div class="row mt-5">
+    <div class="col-4">
+        <div class="input-group">
+            <div class="input-group-append pr-1">
+                <h6>Vendedor: </h6>
+            </div>
+            <select required name="vendedor" class="form-control border border-dark bg-secondary text-white"
+                id="vendedor">
+                {% for i in Personal %}
+                <option >{{i.nombre}}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+</div>
+
+
+
+
 <div class="row mt-5">
     <div class="col-12">
         <div class="input-group" id="div-cliente">
@@ -404,6 +424,9 @@
                 'cliente': document.getElementById("cliente").value,
                 'comentarios': document.getElementById("comentarios").value,
                 'ticket': document.getElementById("impresion").value,
+
+                'vendedor': document.getElementById("vendedor").value,
+
                 'efectivo': document.getElementById("efectivo").value,
                 'tarjeta': document.getElementById("tarjeta").value,
                 'transferencia': document.getElementById("transferencia").value,

@@ -18,14 +18,19 @@
     <div class="container">
         <div class="row">
             <div class="col-12 text-center">
-                <img src="{{empresa.imagen.url}}" alt="Logo empresa" width="30" height="3"> <br>
-                # Ticket: {{num_ticket}} <br>
-                Fecha: {{fecha}} <br>
-                <h5> <b>{{empresa.nombre}} </b></h5>
+                <img src="{{empresa.imagen.url}}" alt=" Logo empresa" width="30" height="3"><br>
+                               
+                RUC:10429550101 <br>
                 {{empresa.domicilio}} <br>
-                {{empresa.telefono}}<br>
+                Cel: {{empresa.telefono}}<br>
+                RECIBO N°{{num_ticket}}<br><br>
+                Fecha:{{fecha|date:"d/m/Y"}} {{hora}} <br>
+                Vendedor(a):{{vendedor}}
+                
+                ------------------------------------------<br>          
                 Cliente: {{cliente}} <br>
-                <br>
+                Telefono: {{telefono}}<br>
+                ------------------------------------------<br> 
             </div>
         </div>
         <div class="row">
@@ -37,14 +42,14 @@
                             <td style="width:60%"> <b> Producto</b> </td>
                             <td style="width:20%"> <b>Subtotal</b>  </td>
                         </tr>
-                    </thead>
+                    </thead>                  
                     <tbody class="text-dark">
                         {% if iva == "false" or iva == "False" %}
                         {% for i in items %}
                         <tr>
                             <td>{{i.cantidad}}</td>
                             <td>{{i.producto.descripcion}}</td>
-                            <td>{{empresa.moneda}} {{i.total|intcomma}}</td>
+                            <td>{{i.total|intcomma}}</td>
 
                         </tr>
                         {% endfor %}
@@ -60,6 +65,7 @@
                         {% endif %}
                     </tbody>
                 </table>
+                ------------------------------------------<br>
             </div>
         </div>
         <div class="row">
@@ -69,11 +75,15 @@
                 <h5 style="text-align: right;"> <b> Iva: {{empresa.moneda}} {{iva_suma|floatformat:"2"|intcomma}}</b></h5>
                 {% endif %}
                 <h5 style="text-align: right;"> <b> Total: {{empresa.moneda}} {{total|floatformat:"2"|intcomma}}</b></h5>
+                <h5 style="text-align: right;">  A cuenta: {{empresa.moneda}} {{A_cuenta|floatformat:"2"|intcomma}}</h5>
+                <h5 style="text-align: right;">  Saldo: {{empresa.moneda}}{{Saldo}}</h5>
+                ------------------------------------------
             </div>
         </div>
         <div class="row">
             <div class="col-12">
                 <p style="text-align: center;">GRACIAS POR SU PREFERENCIA</P>
+                    Hora de entrega: {{Hora_entrega}}
             </div>
         </div>
     </div>

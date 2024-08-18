@@ -118,6 +118,20 @@ function editarPersonal(id, nombre, telefono, cargo, codigo, zona) {
   document.getElementById("zona_editar").value = zona;
 }
 
+function editarCliente(id, codigo,nombre,Edad,telefono,OD_Esf,OI_Esf,OD_Cil,OI_Cil,ADD,DIP) {
+  document.getElementById("id_personal_editar").value = id;
+  document.getElementById("codigo_editar").value = codigo;
+  document.getElementById("nombre_editar").value = nombre;
+  document.getElementById("Edad_editar").value = Edad;
+  document.getElementById("telefono_editar").value = telefono;
+  document.getElementById("OD_Esf_editar").value = OD_Esf;
+  document.getElementById("OI_Esf_editar").value = OI_Esf;
+  document.getElementById("OD_Cil_editar").value = OD_Cil;
+  document.getElementById("OI_Cil_editar").value = OI_Cil;
+  document.getElementById("ADD_editar").value = ADD;
+  document.getElementById("DIP_editar").value = DIP;
+}
+
 function eliminarPersonal(id) {
   document.getElementById("id_personal_eliminar").value = id;
 }
